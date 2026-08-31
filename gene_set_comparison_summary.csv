@@ -1,0 +1,2 @@
+anova_genes,nsc_genes,overlap,anova_only,nsc_only,union,jaccard_similarity,pct_anova_in_overlap,pct_nsc_in_overlap
+1000,1001,760,240,241,1241,0.6124093473005641,76.0,75.92407592407594
