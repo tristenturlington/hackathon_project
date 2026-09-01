@@ -16,6 +16,7 @@ __all__ = [
     "stratified_train_test_split",
     "support_vector_machine",
     "variance_threshold",
+    "logistic_regression",
 ]
 
 # The __all__ list defines the public API of this package. When using

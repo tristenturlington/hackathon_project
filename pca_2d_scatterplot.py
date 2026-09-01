@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_pca(reduced_features, labels, predictions=None):
+def plot_pca(reduced_features, labels, predictions=None, axes_1 = 0, axes_2 = 1):
     """Plot patients using their first two PCA component values."""
     labels = np.asarray(labels)
 
@@ -12,8 +12,8 @@ def plot_pca(reduced_features, labels, predictions=None):
         class_mask = labels == cancer_type
 
         axes.scatter(
-            reduced_features[class_mask, 0],
-            reduced_features[class_mask, 1],
+            reduced_features[class_mask, axes_1],
+            reduced_features[class_mask, axes_2],
             label=cancer_type,
             alpha=0.75,
             s=50,
@@ -24,8 +24,8 @@ def plot_pca(reduced_features, labels, predictions=None):
         incorrect_mask = predictions != labels
 
         axes.scatter(
-            reduced_features[incorrect_mask, 0],
-            reduced_features[incorrect_mask, 1],
+            reduced_features[incorrect_mask, axes_1],
+            reduced_features[incorrect_mask, axes_2],
             facecolors="none",
             edgecolors="black",
             linewidths=2,
