@@ -36,7 +36,7 @@ def main():
     )
     reduced_training_features, reduced_test_features = principal_component_analysis(
         selected_training_features, selected_test_features
-    )
+    )  
     classifier = support_vector_machine(reduced_training_features, training_labels)
     return model_evaluation(classifier, reduced_test_features, test_labels)
 
