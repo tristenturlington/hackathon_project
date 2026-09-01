@@ -19,8 +19,8 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 # ----------------------------------------------------------------------
 # 1. Load data
 # ----------------------------------------------------------------------
-DATA_PATH = "data.csv"
-LABELS_PATH = "labels.csv"
+DATA_PATH = "dataset/data.csv"
+LABELS_PATH = "dataset/labels.csv"
 
 X = pd.read_csv(DATA_PATH, index_col=0)
 y_df = pd.read_csv(LABELS_PATH, index_col=0)
