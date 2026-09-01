@@ -25,7 +25,7 @@ LABELS_PATH = "dataset/labels.csv"
 X = pd.read_csv(DATA_PATH, index_col=0)
 y_df = pd.read_csv(LABELS_PATH, index_col=0)
 
-# Align samples between the two files, just in case order differs
+# Reorders the samples in DATA to match LABELS
 X = X.loc[y_df.index]
 y = y_df.iloc[:, 0]  # the label column
 
