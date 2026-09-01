@@ -30,7 +30,7 @@ LABELS_PATH = "dataset/labels.csv"
 N_SAMPLES_PER_CLASS = 10**9  # effectively "all available"
 K = 1000                      # matches cancer_gene_svm.py's K=1000
 
-OUTPUT_PATH = "expression_heatmap_selected_genes.pdf"
+OUTPUT_PATH = "heatmap_selected_genes.pdf"
 
 # ----------------------------------------------------------------------
 # 2. Load data

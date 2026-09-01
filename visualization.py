@@ -31,8 +31,8 @@ N_SAMPLES = 50       # how many samples (rows) to show
 N_GENES = 50          # how many genes (columns) to show
 GENE_SELECTION = "most_variable"  # "first" or "most_variable"
 
-OUTPUT_PLAIN = "expression_heatmap_plain.pdf"
-OUTPUT_LABELED = "expression_heatmap_labeled.pdf"
+OUTPUT_PLAIN = "heatmap_plain.pdf"
+OUTPUT_LABELED = "heatmap_sorted.pdf"
 
 # ----------------------------------------------------------------------
 # 2. Load data
