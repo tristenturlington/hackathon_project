@@ -1,13 +1,15 @@
 """
 Compare the set of genes selected by two different methods:
   1. ANOVA F-test (SelectKBest, k=1000)  -- the feature selection step used
-     before PCA in cancer_gene_svm.py
+     before PCA in svm_baseline.py
   2. NSC shrinkage at the Delta that yields ~1000 active genes -- from
-     nsc_classifier.py
+     nearest_shrunken_centroids.py
 
 Both use the identical data loading, cleaning, and train/test split, so the
 comparison is apples-to-apples: same 640 training samples decide both gene sets.
 """
+
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -17,8 +19,10 @@ from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_classif
 # ----------------------------------------------------------------------
 # 1. Load data (identical to both other scripts)
 # ----------------------------------------------------------------------
-DATA_PATH = "dataset/data.csv"
-LABELS_PATH = "dataset/labels.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "dataset" / "data.csv"
+LABELS_PATH = PROJECT_ROOT / "dataset" / "labels.csv"
+TABLES_DIRECTORY = PROJECT_ROOT / "results" / "tables"
 
 X = pd.read_csv(DATA_PATH, index_col=0)
 y_df = pd.read_csv(LABELS_PATH, index_col=0)
@@ -47,7 +51,7 @@ classes = np.unique(y_train)
 n_train = X_train.shape[0]
 
 # ----------------------------------------------------------------------
-# 4. Method 1: ANOVA F-test top 1000 genes (same as cancer_gene_svm.py)
+# 4. Method 1: ANOVA F-test top 1000 genes (same as svm_baseline.py)
 # ----------------------------------------------------------------------
 K = 1000
 anova_selector = SelectKBest(score_func=f_classif, k=K)
@@ -59,7 +63,7 @@ print(f"\nANOVA F-test selected {len(anova_genes)} genes.")
 
 # ----------------------------------------------------------------------
 # 5. Method 2: NSC shrinkage at the delta that yields ~1000 active genes
-#    (reusing the same NSC math from nsc_classifier.py)
+#    (reusing the same NSC math from nearest_shrunken_centroids.py)
 # ----------------------------------------------------------------------
 def fit_nsc(X_train, y_train, classes):
     n_total, n_feat = X_train.shape
@@ -170,16 +174,18 @@ summary_df = pd.DataFrame([{
     "pct_anova_in_overlap": pct_of_anova_in_overlap,
     "pct_nsc_in_overlap": pct_of_nsc_in_overlap,
 }])
-summary_df.to_csv("gene_set_comparison_summary.csv", index=False)
-print("\nSaved summary to gene_set_comparison_summary.csv")
+summary_path = TABLES_DIRECTORY / "gene_set_comparison_summary.csv"
+summary_df.to_csv(summary_path, index=False)
+print(f"\nSaved summary to {summary_path}")
 
 # Save full gene lists with a column showing which method(s) selected each gene
 all_genes_df = pd.DataFrame({"gene": sorted(union)})
 all_genes_df["selected_by_anova"] = all_genes_df["gene"].isin(anova_genes)
 all_genes_df["selected_by_nsc"] = all_genes_df["gene"].isin(nsc_genes)
 all_genes_df["selected_by_both"] = all_genes_df["gene"].isin(overlap)
-all_genes_df.to_csv("gene_set_comparison_full.csv", index=False)
-print("Saved full gene-by-gene comparison to gene_set_comparison_full.csv")
+full_results_path = TABLES_DIRECTORY / "gene_set_comparison_full.csv"
+all_genes_df.to_csv(full_results_path, index=False)
+print(f"Saved full gene-by-gene comparison to {full_results_path}")
 print("(columns: gene, selected_by_anova, selected_by_nsc, selected_by_both)")
 
 print("\nThis data is ready for a Venn diagram: "

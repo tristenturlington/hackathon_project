@@ -1,17 +1,19 @@
 """
 For the top genes most predictive of cancer type (by ANOVA F-test, same
-selection as cancer_gene_svm.py), plot overlapping/translucent histograms
+selection as svm_baseline.py), plot overlapping/translucent histograms
 of that gene's expression - one histogram per cancer type - to visually
 show WHY that gene is predictive (i.e. do the cancer types' distributions
 actually separate from each other?).
 
-Expects the same two files as cancer_gene_svm.py:
+Expects the same two files as svm_baseline.py:
   - dataset/data.csv   : samples (rows) x genes (columns), first col = sample ID
   - dataset/labels.csv : sample ID -> cancer type (BRCA, KIRC, COAD, LUAD, PRAD)
 
 Produces one PDF:
   - gene_histograms_by_cancer_type.pdf
 """
+
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -21,13 +23,14 @@ from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_classif
 # ----------------------------------------------------------------------
 # 1. Config
 # ----------------------------------------------------------------------
-DATA_PATH = "dataset/data.csv"
-LABELS_PATH = "dataset/labels.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "dataset" / "data.csv"
+LABELS_PATH = PROJECT_ROOT / "dataset" / "labels.csv"
 
 N_GENES_TO_PLOT = 6   # how many top genes to show (one subplot each)
 BINS = 20
 
-OUTPUT_PATH = "gene_histogram_by_cancer_type.pdf"
+OUTPUT_PATH = PROJECT_ROOT / "results" / "figures" / "gene_histogram_by_cancer_type.pdf"
 
 RIBBON_COLORS = {
     "BRCA": "#FF69B4",  # breast cancer - pink
@@ -48,7 +51,7 @@ y = y_df.iloc[:, 0]
 print(f"Loaded {X.shape[0]} samples x {X.shape[1]} genes.")
 
 # ----------------------------------------------------------------------
-# 3. Same feature selection as cancer_gene_svm.py - find the top genes
+# 3. Same feature selection as svm_baseline.py - find the top genes
 # ----------------------------------------------------------------------
 var_filter = VarianceThreshold(threshold=0.0)
 X_filtered = var_filter.fit_transform(X)

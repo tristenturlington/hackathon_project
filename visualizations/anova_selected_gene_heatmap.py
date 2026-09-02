@@ -1,18 +1,20 @@
 """
-Visualize the genes that the SVM pipeline (cancer_gene_svm.py) actually
+Visualize the genes that the SVM pipeline (svm_baseline.py) actually
 selected as most associated with cancer type, as a heatmap grouped by class.
 
-This mirrors Part 4 of cancer_gene_svm.py (SelectKBest + f_classif) so the
+This mirrors Part 4 of svm_baseline.py (SelectKBest + f_classif) so the
 genes you see here are the same ones feeding the model - not just a
 high-variance or arbitrary slice of the data.
 
-Expects the same two files as cancer_gene_svm.py:
+Expects the same two files as svm_baseline.py:
   - dataset/data.csv   : samples (rows) x genes (columns), first col = sample ID
   - dataset/labels.csv : sample ID -> cancer type (BRCA, KIRC, COAD, LUAD, PRAD)
 
 Produces one PDF:
   - expression_heatmap_selected_genes.pdf
 """
+
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -24,13 +26,14 @@ from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_classif
 # ----------------------------------------------------------------------
 # 1. Config
 # ----------------------------------------------------------------------
-DATA_PATH = "dataset/data.csv"
-LABELS_PATH = "dataset/labels.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "dataset" / "data.csv"
+LABELS_PATH = PROJECT_ROOT / "dataset" / "labels.csv"
 
 N_SAMPLES_PER_CLASS = 10**9  # effectively "all available"
-K = 1000                      # matches cancer_gene_svm.py's K=1000
+K = 1000                      # matches svm_baseline.py's K=1000
 
-OUTPUT_PATH = "heatmap_selected_genes.pdf"
+OUTPUT_PATH = PROJECT_ROOT / "results" / "figures" / "heatmap_selected_genes.pdf"
 
 # ----------------------------------------------------------------------
 # 2. Load data
@@ -44,7 +47,7 @@ print(f"Loaded {X.shape[0]} samples x {X.shape[1]} genes.")
 print("Class counts:\n", y.value_counts())
 
 # ----------------------------------------------------------------------
-# 3. Same feature selection as cancer_gene_svm.py Part 2 + Part 4
+# 3. Same feature selection as svm_baseline.py Part 2 + Part 4
 #    (run on the FULL dataset here, just for visualization purposes -
 #    your actual model still fits selection only on the training split,
 #    to avoid leakage; this script is just for looking at the data)

@@ -8,6 +8,8 @@ Expects two CSV files downloaded from the Kaggle dataset:
 Update the file paths below to match wherever you saved them.
 """
 
+from pathlib import Path
+
 import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.feature_selection import VarianceThreshold, SelectKBest, f_classif
@@ -19,8 +21,9 @@ from sklearn.metrics import classification_report, confusion_matrix, accuracy_sc
 # ----------------------------------------------------------------------
 # 1. Load data
 # ----------------------------------------------------------------------
-DATA_PATH = "dataset/data.csv"
-LABELS_PATH = "dataset/labels.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "dataset" / "data.csv"
+LABELS_PATH = PROJECT_ROOT / "dataset" / "labels.csv"
 
 X = pd.read_csv(DATA_PATH, index_col=0)
 y_df = pd.read_csv(LABELS_PATH, index_col=0)

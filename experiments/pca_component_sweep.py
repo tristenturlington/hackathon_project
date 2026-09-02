@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from pipeline_steps import model_evaluation, prep_data, support_vector_machine
 
 
-def pca_accuracy_eval() -> None:
+def pca_component_sweep() -> None:
     (
         reduced_training_features,
         reduced_test_features,
@@ -33,4 +33,4 @@ def pca_accuracy_eval() -> None:
 
 
 if __name__ == "__main__":
-    pca_accuracy_eval()
+    pca_component_sweep()

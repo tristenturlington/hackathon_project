@@ -1,4 +1,4 @@
-"""Individual stages of the cancer gene SVM pipeline."""
+"""Reusable stages of the cancer gene-classification pipeline."""
 
 from .anova_test import anova_test
 from .load_data import load_data

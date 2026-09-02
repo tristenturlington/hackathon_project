@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_pca(reduced_features, labels, predictions=None, axes_1 = 0, axes_2 = 1):
+def pca_scatterplot(reduced_features, labels, predictions=None, axes_1=0, axes_2=1):
     """Plot patients using their first two PCA component values."""
     labels = np.asarray(labels)
 

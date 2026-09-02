@@ -3,9 +3,11 @@ Nearest Shrunken Centroids (NSC / PAM) classifier, implemented from scratch
 following Tibshirani, Hastie, Narasimhan & Chu (2002), PNAS:
 "Diagnosis of multiple cancer types by shrunken centroids of gene expression"
 
-This reuses the same data loading / cleaning / train-test split as
-cancer_gene_svm.py, so results are directly comparable to the SVM pipeline.
+This reuses the same data loading, cleaning, and train/test split as
+svm_baseline.py, so results are directly comparable to the SVM pipeline.
 """
+
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -14,10 +16,12 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 # ----------------------------------------------------------------------
-# 1. Load data (same as cancer_gene_svm.py)
+# 1. Load data (same as svm_baseline.py)
 # ----------------------------------------------------------------------
-DATA_PATH = "dataset/data.csv"
-LABELS_PATH = "dataset/labels.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "dataset" / "data.csv"
+LABELS_PATH = PROJECT_ROOT / "dataset" / "labels.csv"
+TABLES_DIRECTORY = PROJECT_ROOT / "results" / "tables"
 
 X = pd.read_csv(DATA_PATH, index_col=0)
 y_df = pd.read_csv(LABELS_PATH, index_col=0)
@@ -28,7 +32,7 @@ y = y_df.iloc[:, 0]
 print(f"Loaded {X.shape[0]} samples with {X.shape[1]} genes.")
 
 # ----------------------------------------------------------------------
-# 2. Drop zero-variance genes (same as cancer_gene_svm.py)
+# 2. Drop zero-variance genes (same as svm_baseline.py)
 # ----------------------------------------------------------------------
 var_filter = VarianceThreshold(threshold=0.0)
 X_filtered = var_filter.fit_transform(X)
@@ -36,7 +40,7 @@ gene_names = X.columns[var_filter.get_support()]
 print(f"After removing zero-variance genes: {X_filtered.shape[1]} genes remain.")
 
 # ----------------------------------------------------------------------
-# 3. Train/test split (same random_state as cancer_gene_svm.py for a fair comparison)
+# 3. Train/test split (same random_state as svm_baseline.py for a fair comparison)
 # ----------------------------------------------------------------------
 X_train, X_test, y_train, y_test = train_test_split(
     X_filtered, y, test_size=0.2, stratify=y, random_state=42
@@ -148,16 +152,21 @@ def classify(X, centroids, s_i, s0, class_sizes, n_total, classes):
     return np.array(classes)[pred_idx]
 
 
+def active_gene_mask(shrunken_d):
+    """Return a mask of genes active for at least one cancer class."""
+    n_features = next(iter(shrunken_d.values())).shape[0]
+    active = np.zeros(n_features, dtype=bool)
+    for d in shrunken_d.values():
+        active |= d != 0
+    return active
+
+
 def count_active_genes(shrunken_d):
     """
     Counts how many genes have a nonzero shrunken score for AT LEAST ONE class
     (i.e., genes that still influence classification after shrinkage).
     """
-    n_features = next(iter(shrunken_d.values())).shape[0]
-    active = np.zeros(n_features, dtype=bool)
-    for k, d in shrunken_d.items():
-        active |= (d != 0)
-    return active.sum()
+    return active_gene_mask(shrunken_d).sum()
 
 
 # ----------------------------------------------------------------------
@@ -226,8 +235,9 @@ print(pd.DataFrame(
 # ----------------------------------------------------------------------
 # 8. Save results for the visualization teammate
 # ----------------------------------------------------------------------
-results_df.to_csv("nsc_delta_sweep.csv", index=False)
-print("\nSaved delta-sweep results to nsc_delta_sweep.csv "
+delta_sweep_path = TABLES_DIRECTORY / "nsc_delta_sweep.csv"
+results_df.to_csv(delta_sweep_path, index=False)
+print(f"\nSaved delta-sweep results to {delta_sweep_path} "
       "(columns: delta, n_active_genes, train_acc, test_acc)")
 
 # Save the top genes that survive shrinkage at the best delta, per class,
@@ -246,13 +256,14 @@ for k, gene_list in top_genes_per_class.items():
     for gene, score in gene_list:
         rows.append({"class": k, "gene": gene, "shrunken_d_score": score})
 
-pd.DataFrame(rows).to_csv("nsc_top_genes_per_class.csv", index=False)
-print("Saved top discriminative genes per class to nsc_top_genes_per_class.csv")
+top_genes_path = TABLES_DIRECTORY / "nsc_top_genes_per_class.csv"
+pd.DataFrame(rows).to_csv(top_genes_path, index=False)
+print(f"Saved top discriminative genes per class to {top_genes_path}")
 
 # ----------------------------------------------------------------------
 # 9. Export gene expression data for the delta=8 gene set (for heatmap)
 # ----------------------------------------------------------------------
-active_mask_best = count_active_genes(shrunk_d)  # boolean array, True = gene survived shrinkage
+active_mask_best = active_gene_mask(shrunk_d)
 selected_genes_best = gene_names[active_mask_best]
 
 print(f"\nExporting {len(selected_genes_best)} genes selected at delta={best_delta} for heatmap.")
@@ -266,6 +277,7 @@ X_all_selected = pd.DataFrame(
 )
 X_all_selected["Class"] = pd.concat([y_train, y_test]).values
 
-X_all_selected.to_csv("nsc_delta8_selected_gene_expression.csv")
-print("Saved to nsc_delta8_selected_gene_expression.csv "
+selected_expression_path = TABLES_DIRECTORY / "nsc_selected_gene_expression.csv"
+X_all_selected.to_csv(selected_expression_path)
+print(f"Saved to {selected_expression_path} "
       f"({X_all_selected.shape[0]} samples x {len(selected_genes_best)} genes + Class label)")

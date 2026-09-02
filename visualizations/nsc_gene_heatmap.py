@@ -11,7 +11,7 @@ rather than the sequential viridis colormap used for the raw expression
 heatmaps.
 
 Also cross-references against the top genes previously found via
-SelectKBest/ANOVA F-test (visualize_selected_genes.py / plot_gene_histograms.py)
+SelectKBest/ANOVA F-test (anova_selected_gene_heatmap.py / anova_gene_histograms.py)
 and marks any overlapping genes with a star, since agreement between two
 independent methods is a strong signal those genes are real markers.
 
@@ -22,18 +22,21 @@ Output:
   - nsc_top_genes_heatmap.pdf
 """
 
+from pathlib import Path
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # ----------------------------------------------------------------------
 # 1. Config
 # ----------------------------------------------------------------------
-DATA_PATH = "nsc_top_genes_per_class.csv"
-OUTPUT_PATH = "nsc_top_genes_heatmap.pdf"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "results" / "tables" / "nsc_top_genes_per_class.csv"
+OUTPUT_PATH = PROJECT_ROOT / "results" / "figures" / "nsc_top_genes_heatmap.pdf"
 
 CLASS_ORDER = ["BRCA", "COAD", "KIRC", "LUAD", "PRAD"]
 
-# Genes previously found via ANOVA F-test (top 6, from plot_gene_histograms.py)
+# Genes previously found via ANOVA F-test (top 6, from anova_gene_histograms.py)
 # used here just to flag overlap - update this list if your top-K changes.
 FTEST_TOP_GENES = {
     "gene_9175", "gene_9176", "gene_220", "gene_219",

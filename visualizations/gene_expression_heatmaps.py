@@ -15,6 +15,8 @@ Produces two PDFs:
 Update the file paths / sample & gene counts below as needed.
 """
 
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,15 +26,17 @@ from matplotlib.patches import Patch
 # ----------------------------------------------------------------------
 # 1. Config
 # ----------------------------------------------------------------------
-DATA_PATH = "dataset/data.csv"
-LABELS_PATH = "dataset/labels.csv"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_PATH = PROJECT_ROOT / "dataset" / "data.csv"
+LABELS_PATH = PROJECT_ROOT / "dataset" / "labels.csv"
 
 N_SAMPLES = 50       # how many samples (rows) to show
 N_GENES = 50          # how many genes (columns) to show
 GENE_SELECTION = "most_variable"  # "first" or "most_variable"
 
-OUTPUT_PLAIN = "heatmap_plain.pdf"
-OUTPUT_LABELED = "heatmap_sorted.pdf"
+FIGURES_DIRECTORY = PROJECT_ROOT / "results" / "figures"
+OUTPUT_PLAIN = FIGURES_DIRECTORY / "heatmap_plain.pdf"
+OUTPUT_LABELED = FIGURES_DIRECTORY / "heatmap_sorted.pdf"
 
 # ----------------------------------------------------------------------
 # 2. Load data
